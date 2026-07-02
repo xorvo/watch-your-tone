@@ -12,9 +12,10 @@ to improve.
 
 ## Features
 
-- **Inline refinement** — focus any text box and a small ✎ button appears, or
-  press <kbd>Ctrl/Cmd</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd>, or right-click a
-  selection.
+- **Open where you type** — right-click a text field → **Refine with Toner**, or
+  press the keyboard shortcut (default <kbd>Ctrl/⌘</kbd>+<kbd>Shift</kbd>+<kbd>.</kbd>,
+  rebindable at `chrome://extensions/shortcuts`). No on-page overlay, so it never
+  covers other page controls.
 - **Quick actions** — Improve, Fix grammar, Make concise, Make clearer, Warmer,
   More direct, More professional, More diplomatic, Check tone, and Alternatives.
 - **Personas** — pick a voice instead of a one-size-fits-all mode: Thoughtful
@@ -39,7 +40,7 @@ This is an unpacked Chrome extension — no build step.
 2. Open `chrome://extensions` in Chrome (or any Chromium browser).
 3. Turn on **Developer mode** (top right).
 4. Click **Load unpacked** and select this folder.
-5. Click the Toner toolbar icon → the ⚙ gear → **Settings** to add
+5. Click the Toner toolbar icon → the gear icon → **Settings** to add
    your credentials.
 
 ## Setup
@@ -99,7 +100,7 @@ device only, never synced**.
 ## How it works
 
 ```
-Editable field ──(user clicks ✎ / shortcut)──▶ content script (shadow-DOM panel)
+Editable field ──(right-click / shortcut)──▶ content script (shadow-DOM panel)
                                                       │  TONER_REWRITE
                                                       ▼
                                             background service worker

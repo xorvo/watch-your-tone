@@ -10,20 +10,24 @@ import { actionMenu } from "../lib/actions.js";
 // Right-click context menu on selected text.
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
-    id: "toner-improve",
-    title: "Toner: improve selection",
-    contexts: ["selection", "editable"],
+    id: "toner-refine",
+    title: "Refine with Toner",
+    contexts: ["editable"],
   });
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "toner-improve" && tab?.id) {
-    chrome.tabs.sendMessage(tab.id, {
-      type: "TONER_OPEN_PANEL",
-      actionId: "improve",
-      selectionText: info.selectionText || "",
-    });
+  if (info.menuItemId === "toner-refine" && tab?.id) {
+    chrome.tabs.sendMessage(tab.id, { type: "TONER_OPEN_PANEL" }, () => void chrome.runtime.lastError);
   }
+});
+
+// Keyboard shortcut (Commands API). Browser-level, so it works inside inputs and
+// isn't intercepted by page-level extensions like Vimium.
+chrome.commands.onCommand.addListener(async (command) => {
+  if (command !== "open-panel") return;
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (tab?.id) chrome.tabs.sendMessage(tab.id, { type: "TONER_OPEN_PANEL" }, () => void chrome.runtime.lastError);
 });
 
 // Detect a friendly app name from a hostname, for context hints.
@@ -94,7 +98,6 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
           actions: actionMenu(),
           activePersonaId: settings.personaId,
           configured: await isConfigured(),
-          showInlineButton: settings.showInlineButton,
           disabledSites: settings.disabledSites,
         });
         break;

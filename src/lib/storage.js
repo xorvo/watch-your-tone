@@ -52,11 +52,8 @@ export const DEFAULTS = {
     autoDetectApp: true,
   },
 
-  // Sites where the inline UI is disabled (hostnames)
+  // Sites where Toner is disabled (hostnames)
   disabledSites: [],
-
-  // Show the floating inline button on editable fields
-  showInlineButton: true,
 };
 
 export async function getSettings() {

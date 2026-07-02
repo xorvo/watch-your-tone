@@ -1,7 +1,7 @@
 // Toner — content script.
-// Detects editable fields, shows a floating button, and renders a refinement
-// panel inside a shadow root (so the host page's CSS can't interfere).
-// It reads text only on explicit user action and replaces text only on approval.
+// Renders the refinement panel inside a shadow root, opened via the right-click
+// menu or the keyboard command (no on-page overlay button — it never covers page
+// controls). It reads text only when you open it and replaces text only on approval.
 
 (() => {
   if (window.__tonerLoaded) return;
@@ -17,17 +17,15 @@
       { id: "tone", label: "Check tone" },
     ],
     activePersonaId: "none",
-    showInlineButton: true,
     disabledSites: [],
   };
 
-  let currentField = null; // the editable element we're attached to
+  let currentField = null; // the editable element the panel is acting on
   let capture = null; // snapshot of text taken when the panel opens
   let host = null; // shadow host element
   let root = null; // shadow root
-  let btn = null; // floating button element
+  let panel = null;
   let panelOpen = false;
-  let hideTimer = null;
 
   // ---- editable detection ----------------------------------------------------
   const TEXT_INPUT_TYPES = new Set(["text", "search", "email", "url", "tel", ""]);
@@ -68,7 +66,6 @@
         hadSelection,
         selStart: start,
         selEnd: end,
-        selectedText: hadSelection ? full.slice(start, end) : "",
         fullText: full,
         text: hadSelection ? full.slice(start, end) : full,
       };
@@ -84,7 +81,6 @@
       el,
       isCE: true,
       hadSelection: Boolean(selectedText),
-      selectedText,
       fullText: full,
       text: selectedText || full,
     };
@@ -133,11 +129,8 @@
     return new Promise((resolve) => {
       try {
         chrome.runtime.sendMessage(message, (resp) => {
-          if (chrome.runtime.lastError) {
-            resolve({ ok: false, error: chrome.runtime.lastError.message });
-          } else {
-            resolve(resp);
-          }
+          if (chrome.runtime.lastError) resolve({ ok: false, error: chrome.runtime.lastError.message });
+          else resolve(resp);
         });
       } catch (e) {
         resolve({ ok: false, error: String(e) });
@@ -146,39 +139,9 @@
   }
 
   // ---- UI --------------------------------------------------------------------
-  // The app icon, inline so it renders crisply at any size (no asset load).
-  const ICON_SVG = `<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <defs>
-      <linearGradient id="tico-bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
-        <stop offset="0" stop-color="#12897d"/><stop offset="1" stop-color="#0a4952"/>
-      </linearGradient>
-      <linearGradient id="tico-t" x1="0" y1="38" x2="0" y2="88" gradientUnits="userSpaceOnUse">
-        <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d6f5ef"/>
-      </linearGradient>
-      <clipPath id="tico-r"><rect width="128" height="128" rx="29"/></clipPath>
-    </defs>
-    <g clip-path="url(#tico-r)">
-      <rect width="128" height="128" fill="url(#tico-bg)"/>
-      <ellipse cx="40" cy="12" rx="84" ry="52" fill="#ffffff" opacity="0.09"/>
-    </g>
-    <rect x="30" y="38" width="68" height="16" rx="8" fill="url(#tico-t)"/>
-    <rect x="56" y="38" width="16" height="50" rx="8" fill="url(#tico-t)"/>
-  </svg>`;
-
-  const BTN_SIZE = 18; // px — small, unobtrusive
-
   const STYLE = `
   :host { all: initial; }
   * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-  .toner-btn {
-    position: fixed; z-index: 2147483646; cursor: pointer;
-    width: 18px; height: 18px; padding: 0; border: none; background: transparent;
-    line-height: 0; border-radius: 5px; user-select: none; opacity: 0.85;
-    box-shadow: 0 1px 4px rgba(15,23,42,.32);
-    transition: opacity .12s ease, transform .12s ease;
-  }
-  .toner-btn:hover { opacity: 1; transform: scale(1.1); }
-  .toner-btn svg { display: block; width: 100%; height: 100%; border-radius: 5px; }
 
   .toner-panel {
     position: fixed; z-index: 2147483647; width: 360px; max-width: calc(100vw - 24px);
@@ -217,7 +180,6 @@
     padding: 7px 9px; margin-bottom: 8px; font-size: 12.5px; }
 
   .toner-card { border: 1px solid #cdeee9; background: #f5fdfb; border-radius: 10px; padding: 10px; margin-bottom: 10px; }
-  .toner-card + .toner-card { margin-top: 2px; }
   .toner-card-label { font-size: 11px; color: #0f766e; font-weight: 650; margin-bottom: 5px;
     text-transform: uppercase; letter-spacing: .04em; }
   .toner-suggest { width: 100%; min-height: 74px; resize: vertical; border: 1px solid #d1d5db;
@@ -250,46 +212,6 @@
     document.documentElement.appendChild(host);
   }
 
-  function showButton() {
-    if (!CONFIG.showInlineButton || siteDisabled() || !currentField) return;
-    ensureHost();
-    if (!btn) {
-      btn = document.createElement("button");
-      btn.className = "toner-btn";
-      btn.title = "Refine with Toner";
-      btn.innerHTML = ICON_SVG;
-      btn.addEventListener("mousedown", (e) => e.preventDefault());
-      btn.addEventListener("click", () => openPanel());
-      root.appendChild(btn);
-    }
-    positionButton();
-    btn.style.display = "block";
-  }
-
-  function hideButton() {
-    if (btn) btn.style.display = "none";
-  }
-
-  function positionButton() {
-    if (!btn) return;
-    if (!currentField || !document.contains(currentField)) {
-      const a = activeEditable();
-      if (a) currentField = a;
-      else return; // keep last position; focus logic decides when to hide
-    }
-    const r = currentField.getBoundingClientRect();
-    if (!r.width && !r.height) return; // transient layout (e.g. Slack re-render)
-    // Vertically centered against the field, tucked at the right edge.
-    const inset = 6;
-    let top = r.top + r.height / 2 - BTN_SIZE / 2;
-    top = Math.min(Math.max(top, 6), window.innerHeight - BTN_SIZE - 6);
-    let left = r.right - BTN_SIZE - inset;
-    left = Math.min(Math.max(left, 6), window.innerWidth - BTN_SIZE - 6);
-    btn.style.top = `${top}px`;
-    btn.style.left = `${left}px`;
-  }
-
-  let panel = null;
   function buildPanel() {
     ensureHost();
     panel = document.createElement("div");
@@ -341,7 +263,7 @@
   }
 
   function positionPanel() {
-    if (!panel || !currentField) return;
+    if (!panel || !currentField || !document.contains(currentField)) return;
     const r = currentField.getBoundingClientRect();
     const pw = 360;
     let left = Math.min(r.left, window.innerWidth - pw - 12);
@@ -354,15 +276,20 @@
   }
 
   function openPanel(initialAction) {
-    if (!currentField) return;
+    if (siteDisabled()) return;
+    const field = activeEditable();
+    if (!field) {
+      toast("Put your cursor in a text box first, then open Toner.");
+      return;
+    }
+    currentField = field;
     capture = snapshot(currentField);
     if (!panel) buildPanel();
     panel.style.display = "block";
     panelOpen = true;
-    hideButton();
     panel.querySelector(".toner-out").innerHTML = capture.text
       ? `<div class="toner-hint">Pick an action to refine your message.</div>`
-      : `<div class="toner-hint">Type a message in the box, then pick an action.</div>`;
+      : `<div class="toner-hint">This field is empty — type something first.</div>`;
     positionPanel();
     if (initialAction && capture.text) runAction(initialAction);
   }
@@ -371,10 +298,6 @@
     if (panel) panel.style.display = "none";
     panelOpen = false;
     capture = null;
-    if (activeEditable()) {
-      currentField = document.activeElement;
-      showButton();
-    }
   }
 
   async function runAction(actionId) {
@@ -460,6 +383,25 @@
     positionPanel();
   }
 
+  // Small transient toast (e.g. when no text field is focused).
+  let toastEl = null;
+  function toast(text) {
+    ensureHost();
+    if (!toastEl) {
+      toastEl = document.createElement("div");
+      toastEl.style.cssText =
+        "position:fixed;z-index:2147483647;left:50%;bottom:24px;transform:translateX(-50%);" +
+        "background:#111827;color:#fff;padding:9px 14px;border-radius:10px;font-size:13px;" +
+        'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;' +
+        "box-shadow:0 8px 24px rgba(0,0,0,.3);max-width:80vw;";
+      root.appendChild(toastEl);
+    }
+    toastEl.textContent = text;
+    toastEl.style.display = "block";
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => (toastEl.style.display = "none"), 2600);
+  }
+
   function escapeHtml(s) {
     return String(s)
       .replace(/&/g, "&amp;")
@@ -468,74 +410,15 @@
       .replace(/"/g, "&quot;");
   }
 
-  // ---- focus tracking (resilient to Slack-style re-renders) ------------------
-  document.addEventListener(
-    "focusin",
-    (e) => {
-      if (isEditable(e.target)) {
-        currentField = e.target;
-        if (!panelOpen) showButton();
-      }
-    },
-    true
-  );
+  // Reposition the open panel on scroll/resize.
+  window.addEventListener("scroll", () => panelOpen && positionPanel(), true);
+  window.addEventListener("resize", () => panelOpen && positionPanel());
 
-  document.addEventListener(
-    "focusout",
-    () => {
-      // Debounce: Slack (and similar editors) briefly move focus while typing /
-      // re-rendering. Only hide once focus has truly left every editable and our UI.
-      clearTimeout(hideTimer);
-      hideTimer = setTimeout(() => {
-        if (panelOpen) return;
-        const a = document.activeElement;
-        if (a === host) return; // focus is inside our shadow UI
-        const editable = activeEditable();
-        if (editable) {
-          currentField = editable; // still editing (maybe a re-created node)
-          showButton();
-          return;
-        }
-        hideButton();
-      }, 250);
-    },
-    true
-  );
-
-  window.addEventListener(
-    "scroll",
-    () => {
-      if (panelOpen) positionPanel();
-      else positionButton();
-    },
-    true
-  );
-  window.addEventListener("resize", () => {
-    if (panelOpen) positionPanel();
-    else positionButton();
-  });
-
-  // Keyboard shortcut: Ctrl/Cmd+Shift+E opens the panel on the focused field.
-  document.addEventListener(
-    "keydown",
-    (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === "E" || e.key === "e")) {
-        const el = document.activeElement;
-        if (isEditable(el)) {
-          e.preventDefault();
-          currentField = el;
-          openPanel();
-        }
-      }
-    },
-    true
-  );
-
+  // Opened via the right-click menu or the keyboard command (both routed through
+  // the background service worker).
   chrome.runtime.onMessage.addListener((msg) => {
     if (msg?.type === "TONER_OPEN_PANEL") {
-      const el = document.activeElement;
-      if (isEditable(el)) currentField = el;
-      if (currentField) openPanel(msg.actionId || "improve");
+      openPanel(msg.actionId);
     } else if (msg?.type === "TONER_CONFIG_UPDATED") {
       loadConfig();
     }

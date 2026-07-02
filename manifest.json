@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Toner",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "An AI writing coach in your text box. Improve clarity, fix grammar, and adjust tone before you hit send.",
   "icons": {
     "16": "icons/icon16.png",
@@ -26,6 +26,15 @@
   "background": {
     "service_worker": "src/background/service-worker.js",
     "type": "module"
+  },
+  "commands": {
+    "open-panel": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Period",
+        "mac": "Command+Shift+Period"
+      },
+      "description": "Refine the focused text with Toner"
+    }
   },
   "permissions": ["storage", "contextMenus"],
   "host_permissions": [

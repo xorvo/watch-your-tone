@@ -77,7 +77,6 @@ async function load() {
   $("stylePreserveVoice").checked = s.style.preserveVoice !== false;
   $("styleCustom").value = s.style.custom || "";
 
-  $("showInlineButton").checked = s.showInlineButton !== false;
   $("autoDetectApp").checked = s.context.autoDetectApp !== false;
   $("disabledSites").value = (s.disabledSites || []).join("\n");
 }
@@ -114,7 +113,6 @@ function collect() {
       custom: $("styleCustom").value.trim(),
     },
     context: { autoDetectApp: $("autoDetectApp").checked },
-    showInlineButton: $("showInlineButton").checked,
     disabledSites: splitList($("disabledSites").value),
   };
 }
