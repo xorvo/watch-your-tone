@@ -8,14 +8,12 @@ export const PERSONAS = [
   {
     id: "none",
     name: "No persona",
-    emoji: "✍️",
     description: "Just my own style — no persona overlay.",
     prompt: "",
   },
   {
     id: "thoughtful_manager",
     name: "Thoughtful manager",
-    emoji: "🧭",
     description: "Clear and direct, but supportive. Good for feedback, status, ownership.",
     prompt:
       "Write like a thoughtful, effective people manager: clear without sounding cold, " +
@@ -26,7 +24,6 @@ export const PERSONAS = [
   {
     id: "friendly_teammate",
     name: "Friendly teammate",
-    emoji: "🤝",
     description: "Warm, casual, collaborative. Peer-to-peer tone.",
     prompt:
       "Write like a warm, easygoing teammate: friendly and collaborative, low formality, " +
@@ -35,7 +32,6 @@ export const PERSONAS = [
   {
     id: "executive",
     name: "Executive",
-    emoji: "📈",
     description: "Concise, confident, outcome-focused. Senior-leadership tone.",
     prompt:
       "Write like a senior leader: concise, confident, and outcome-focused. Lead with the " +
@@ -44,7 +40,6 @@ export const PERSONAS = [
   {
     id: "customer_support",
     name: "Customer support",
-    emoji: "💬",
     description: "Patient, empathetic, solution-oriented. For customer replies.",
     prompt:
       "Write like an excellent customer support agent: patient, empathetic, and " +
@@ -54,7 +49,6 @@ export const PERSONAS = [
   {
     id: "diplomat",
     name: "Diplomat",
-    emoji: "🕊️",
     description: "De-escalating and tactful. For tense or sensitive threads.",
     prompt:
       "Write like a skilled diplomat de-escalating a tense conversation: calm, tactful, and " +
@@ -64,7 +58,6 @@ export const PERSONAS = [
   {
     id: "recruiter",
     name: "Recruiter",
-    emoji: "🎯",
     description: "Polished, personable, professional. For candidate/recruiter messages.",
     prompt:
       "Write like a great recruiter: polished, personable, and respectful of the reader's " +
@@ -73,7 +66,6 @@ export const PERSONAS = [
   {
     id: "plain_clear",
     name: "Plain & clear",
-    emoji: "🔤",
     description: "Simple English, no jargon. Great for non-native readers.",
     prompt:
       "Rewrite in plain, simple English: short sentences, common words, no jargon, no idioms, " +
@@ -83,7 +75,6 @@ export const PERSONAS = [
   {
     id: "wordsmith",
     name: "Wordsmith",
-    emoji: "🪄",
     description: "Polished, well-crafted prose. For writing that should read beautifully.",
     prompt:
       "Rewrite as a careful wordsmith: graceful, well-structured prose with good rhythm and " +
@@ -97,10 +88,9 @@ export function getPersona(id) {
 
 // Lightweight list for UI (no prompt text).
 export function personaMenu() {
-  return PERSONAS.map(({ id, name, emoji, description }) => ({
+  return PERSONAS.map(({ id, name, description }) => ({
     id,
     name,
-    emoji,
     description,
   }));
 }

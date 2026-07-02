@@ -39,7 +39,7 @@ async function load() {
   pairedToken = s.bagw.token || "";
   if (pairedToken) {
     $("bagwStatus").className = "test-status ok";
-    $("bagwStatus").textContent = "Connected ✓";
+    $("bagwStatus").textContent = "Connected";
   }
 
   $("anthropicApiKey").value = s.anthropicApiKey || "";
@@ -60,7 +60,7 @@ async function load() {
   PERSONAS.forEach((p) => {
     const o = document.createElement("option");
     o.value = p.id;
-    o.textContent = `${p.emoji || ""} ${p.name}`;
+    o.textContent = p.name;
     if (p.id === s.personaId) o.selected = true;
     personaSel.appendChild(o);
   });
@@ -122,7 +122,7 @@ function collect() {
 async function save() {
   await saveSettings(collect());
   const st = $("saveStatus");
-  st.textContent = "Saved ✓";
+  st.textContent = "Saved";
   st.className = "save-status ok";
   // Tell open tabs to refresh their config.
   try {
@@ -156,7 +156,7 @@ async function testConnection() {
     text: "this is a quick conection test",
   });
   if (resp && resp.ok) {
-    st.textContent = "Connection works ✓";
+    st.textContent = "Connection works";
     st.className = "test-status ok";
   } else {
     st.textContent = resp?.error || "Connection failed.";
@@ -218,7 +218,7 @@ async function bagwConnect() {
         bagw: { url: base, token: p.token, agent, model: $("bagwModel").value.trim() },
       });
       st.className = "test-status ok";
-      st.textContent = "Connected ✓ — bagw approved this extension.";
+      st.textContent = "Connected — bagw approved this extension.";
       return;
     }
     if (p.status === "denied") {

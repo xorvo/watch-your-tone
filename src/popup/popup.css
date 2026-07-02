@@ -22,7 +22,8 @@ body {
   background: #0f172a;
   color: #fff;
 }
-.logo { color: #2dd4bf; }
+.logo { width: 16px; height: 16px; border-radius: 5px; display: inline-block;
+  background: linear-gradient(135deg, #2dd4bf, #0a4952); }
 .brand { font-weight: 600; }
 .icon-btn {
   margin-left: auto;

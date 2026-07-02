@@ -50,7 +50,7 @@ async function init() {
   personaMenu().forEach((p) => {
     const o = document.createElement("option");
     o.value = p.id;
-    o.textContent = `${p.emoji || ""} ${p.name}`;
+    o.textContent = p.name;
     if (p.id === settings.personaId) o.selected = true;
     personaSel.appendChild(o);
   });
@@ -63,7 +63,7 @@ async function init() {
   actionMenu().forEach((a) => {
     const o = document.createElement("option");
     o.value = a.id;
-    o.textContent = `${a.emoji || ""} ${a.label}`;
+    o.textContent = a.label;
     actionSel.appendChild(o);
   });
 
@@ -99,7 +99,7 @@ function renderResult(result, out) {
   if (result.toneFeedback)
     html += `<div class="tone">${escapeHtml(result.toneFeedback)}</div>`;
   (result.warnings || []).forEach((w) => {
-    html += `<div class="err" style="margin-bottom:8px">⚠ ${escapeHtml(w)}</div>`;
+    html += `<div class="err" style="margin-bottom:8px">${escapeHtml(w)}</div>`;
   });
   result.suggestions.forEach((s, i) => {
     html += `<div class="card" data-i="${i}">
@@ -114,7 +114,7 @@ function renderResult(result, out) {
       const ta = out.querySelector(`[data-i="${b.dataset.copy}"] textarea`);
       try {
         await navigator.clipboard.writeText(ta.value);
-        b.textContent = "Copied ✓";
+        b.textContent = "Copied";
         setTimeout(() => (b.textContent = "Copy"), 1200);
       } catch {
         b.textContent = "Copy failed";

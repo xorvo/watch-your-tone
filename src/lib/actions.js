@@ -6,7 +6,6 @@ export const ACTIONS = [
   {
     id: "improve",
     label: "Improve",
-    emoji: "✨",
     instruction:
       "Improve this message: fix grammar and awkward phrasing, sharpen clarity, and make it " +
       "read well — while fully preserving the author's intent and meaning.",
@@ -14,7 +13,6 @@ export const ACTIONS = [
   {
     id: "grammar",
     label: "Fix grammar",
-    emoji: "✅",
     instruction:
       "Fix only grammar, spelling, punctuation, and clearly awkward phrasing. Make the " +
       "smallest possible edits. Do not change tone, structure, or meaning.",
@@ -22,7 +20,6 @@ export const ACTIONS = [
   {
     id: "concise",
     label: "Make concise",
-    emoji: "✂️",
     instruction:
       "Make this message shorter and tighter while keeping every important point and the " +
       "author's intent. Cut filler, redundancy, and hedging.",
@@ -30,7 +27,6 @@ export const ACTIONS = [
   {
     id: "clear",
     label: "Make clearer",
-    emoji: "🔍",
     instruction:
       "Make this message easier to understand: clearer structure, plainer wording, and an " +
       "obvious main point. Keep the meaning identical.",
@@ -38,7 +34,6 @@ export const ACTIONS = [
   {
     id: "warmer",
     label: "Warmer",
-    emoji: "🔥",
     instruction:
       "Make this message warmer and more considerate without adding emotion that wasn't " +
       "there or becoming gushy. Keep it genuine.",
@@ -46,7 +41,6 @@ export const ACTIONS = [
   {
     id: "direct",
     label: "More direct",
-    emoji: "➡️",
     instruction:
       "Make this message more direct and to-the-point with a clear ask — without becoming " +
       "rude, blunt, or demanding.",
@@ -54,7 +48,6 @@ export const ACTIONS = [
   {
     id: "professional",
     label: "More professional",
-    emoji: "👔",
     instruction:
       "Make this message sound more professional and polished for a workplace context, " +
       "without turning it into stiff corporate language.",
@@ -62,7 +55,6 @@ export const ACTIONS = [
   {
     id: "diplomatic",
     label: "More diplomatic",
-    emoji: "🕊️",
     instruction:
       "Make this message more diplomatic and tactful, especially if any part could land as " +
       "harsh, blaming, or passive-aggressive. Keep it honest.",
@@ -70,7 +62,6 @@ export const ACTIONS = [
   {
     id: "tone",
     label: "Check tone",
-    emoji: "🎚️",
     toneCheck: true,
     instruction:
       "Assess how this message is likely to come across to the reader. Identify any risk that " +
@@ -80,7 +71,6 @@ export const ACTIONS = [
   {
     id: "alternatives",
     label: "Alternatives",
-    emoji: "🎲",
     multi: true,
     instruction:
       "Provide several distinct rewrites of this message in different styles. Label each one " +
@@ -94,5 +84,5 @@ export function getAction(id) {
 }
 
 export function actionMenu() {
-  return ACTIONS.map(({ id, label, emoji }) => ({ id, label, emoji }));
+  return ACTIONS.map(({ id, label }) => ({ id, label }));
 }
