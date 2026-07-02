@@ -14,7 +14,7 @@ function escapeHtml(s) {
 
 function rewrite(payload) {
   return new Promise((resolve) => {
-    chrome.runtime.sendMessage({ type: "WYT_REWRITE", payload }, (resp) => {
+    chrome.runtime.sendMessage({ type: "TONER_REWRITE", payload }, (resp) => {
       if (chrome.runtime.lastError)
         resolve({ ok: false, error: chrome.runtime.lastError.message });
       else resolve(resp);

@@ -1,4 +1,4 @@
-# Watch Your Tone
+# Toner
 
 An AI writing coach that lives in your text box. Improve clarity, fix grammar,
 and adjust tone **before** you hit send — in Slack, Gmail, Notion, Linear,
@@ -8,7 +8,7 @@ It works like a thoughtful communication coach, not a ghostwriter: it suggests,
 you decide. Nothing is ever sent for you, and it only reads the text you ask it
 to improve.
 
-![Watch Your Tone icon](icons/icon128.png)
+![Toner icon](icons/icon128.png)
 
 ## Features
 
@@ -39,7 +39,7 @@ This is an unpacked Chrome extension — no build step.
 2. Open `chrome://extensions` in Chrome (or any Chromium browser).
 3. Turn on **Developer mode** (top right).
 4. Click **Load unpacked** and select this folder.
-5. Click the Watch Your Tone toolbar icon → the ⚙ gear → **Settings** to add
+5. Click the Toner toolbar icon → the ⚙ gear → **Settings** to add
    your credentials.
 
 ## Setup
@@ -100,7 +100,7 @@ device only, never synced**.
 
 ```
 Editable field ──(user clicks ✎ / shortcut)──▶ content script (shadow-DOM panel)
-                                                      │  WYT_REWRITE
+                                                      │  TONER_REWRITE
                                                       ▼
                                             background service worker
                                             (holds credentials, builds prompt)

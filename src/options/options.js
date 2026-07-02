@@ -128,7 +128,7 @@ async function save() {
   try {
     const tabs = await chrome.tabs.query({});
     tabs.forEach((t) => {
-      if (t.id) chrome.tabs.sendMessage(t.id, { type: "WYT_CONFIG_UPDATED" }, () => void chrome.runtime.lastError);
+      if (t.id) chrome.tabs.sendMessage(t.id, { type: "TONER_CONFIG_UPDATED" }, () => void chrome.runtime.lastError);
     });
   } catch {}
   setTimeout(() => (st.textContent = ""), 2000);
@@ -136,7 +136,7 @@ async function save() {
 
 function rewrite(payload) {
   return new Promise((resolve) => {
-    chrome.runtime.sendMessage({ type: "WYT_REWRITE", payload }, (resp) => {
+    chrome.runtime.sendMessage({ type: "TONER_REWRITE", payload }, (resp) => {
       if (chrome.runtime.lastError)
         resolve({ ok: false, error: chrome.runtime.lastError.message });
       else resolve(resp);
@@ -178,7 +178,7 @@ async function bagwConnect() {
     const r = await fetch(`${base}/pair`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ name: "Watch Your Tone", agent }),
+      body: JSON.stringify({ name: "Toner", agent }),
     });
     pair = await r.json();
   } catch {

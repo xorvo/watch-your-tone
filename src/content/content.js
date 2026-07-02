@@ -1,11 +1,11 @@
-// Watch Your Tone — content script.
+// Toner — content script.
 // Detects editable fields, shows a floating button, and renders a refinement
 // panel inside a shadow root (so the host page's CSS can't interfere).
 // It reads text only on explicit user action and replaces text only on approval.
 
 (() => {
-  if (window.__wytLoaded) return;
-  window.__wytLoaded = true;
+  if (window.__tonerLoaded) return;
+  window.__tonerLoaded = true;
 
   const HOSTNAME = location.hostname;
   let CONFIG = {
@@ -154,63 +154,63 @@
   const STYLE = `
   :host { all: initial; }
   * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-  .wyt-btn {
+  .toner-btn {
     position: fixed; z-index: 2147483646; cursor: pointer;
     background: #14b8a6; color: #fff; border: none; border-radius: 999px;
     width: 30px; height: 30px; font-size: 15px; line-height: 30px; text-align: center;
     box-shadow: 0 2px 8px rgba(0,0,0,.25); padding: 0; user-select: none;
   }
-  .wyt-btn:hover { background: #0d9488; }
-  .wyt-panel {
+  .toner-btn:hover { background: #0d9488; }
+  .toner-panel {
     position: fixed; z-index: 2147483647; width: 380px; max-width: calc(100vw - 24px);
     background: #fff; color: #111827; border: 1px solid #e5e7eb; border-radius: 12px;
     box-shadow: 0 12px 40px rgba(0,0,0,.22); overflow: hidden; font-size: 13px;
   }
-  .wyt-head { display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+  .toner-head { display: flex; align-items: center; gap: 8px; padding: 10px 12px;
     background: #0f172a; color: #fff; }
-  .wyt-title { font-weight: 600; font-size: 13px; flex: 0 0 auto; }
-  .wyt-title .dot { color: #2dd4bf; }
-  .wyt-persona { margin-left: auto; background: #1e293b; color: #fff; border: 1px solid #334155;
+  .toner-title { font-weight: 600; font-size: 13px; flex: 0 0 auto; }
+  .toner-title .dot { color: #2dd4bf; }
+  .toner-persona { margin-left: auto; background: #1e293b; color: #fff; border: 1px solid #334155;
     border-radius: 6px; padding: 3px 6px; font-size: 12px; max-width: 150px; }
-  .wyt-close { background: transparent; border: none; color: #cbd5e1; font-size: 16px;
+  .toner-close { background: transparent; border: none; color: #cbd5e1; font-size: 16px;
     cursor: pointer; padding: 0 2px; }
-  .wyt-body { padding: 12px; max-height: 70vh; overflow: auto; }
-  .wyt-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-  .wyt-action { border: 1px solid #d1d5db; background: #f9fafb; border-radius: 999px;
+  .toner-body { padding: 12px; max-height: 70vh; overflow: auto; }
+  .toner-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .toner-action { border: 1px solid #d1d5db; background: #f9fafb; border-radius: 999px;
     padding: 4px 10px; font-size: 12px; cursor: pointer; color: #111827; }
-  .wyt-action:hover { background: #ecfdf5; border-color: #5eead4; }
-  .wyt-section-label { font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
+  .toner-action:hover { background: #ecfdf5; border-color: #5eead4; }
+  .toner-section-label { font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
     color: #6b7280; margin: 8px 0 4px; }
-  .wyt-orig { background: #f3f4f6; border-radius: 8px; padding: 8px; white-space: pre-wrap;
+  .toner-orig { background: #f3f4f6; border-radius: 8px; padding: 8px; white-space: pre-wrap;
     color: #374151; max-height: 90px; overflow: auto; }
-  .wyt-tone { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; border-radius: 8px;
+  .toner-tone { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; border-radius: 8px;
     padding: 8px; margin: 8px 0; }
-  .wyt-warn { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; border-radius: 8px;
+  .toner-warn { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; border-radius: 8px;
     padding: 6px 8px; margin: 6px 0; font-size: 12px; }
-  .wyt-sugg-label { font-size: 11px; color: #0d9488; font-weight: 600; margin-bottom: 3px; }
-  .wyt-result { border: 1px solid #99f6e4; background: #f0fdfa; border-radius: 8px; padding: 8px; margin-bottom: 10px; }
-  .wyt-suggest { width: 100%; min-height: 70px; resize: vertical; border: 1px solid #d1d5db;
+  .toner-sugg-label { font-size: 11px; color: #0d9488; font-weight: 600; margin-bottom: 3px; }
+  .toner-result { border: 1px solid #99f6e4; background: #f0fdfa; border-radius: 8px; padding: 8px; margin-bottom: 10px; }
+  .toner-suggest { width: 100%; min-height: 70px; resize: vertical; border: 1px solid #d1d5db;
     border-radius: 6px; padding: 6px; font-size: 13px; color: #111827; background: #fff; }
-  .wyt-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-  .wyt-primary { background: #14b8a6; color: #fff; border: none; border-radius: 6px;
+  .toner-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .toner-primary { background: #14b8a6; color: #fff; border: none; border-radius: 6px;
     padding: 6px 12px; font-size: 12px; cursor: pointer; font-weight: 600; }
-  .wyt-primary:hover { background: #0d9488; }
-  .wyt-ghost { background: #fff; color: #111827; border: 1px solid #d1d5db; border-radius: 6px;
+  .toner-primary:hover { background: #0d9488; }
+  .toner-ghost { background: #fff; color: #111827; border: 1px solid #d1d5db; border-radius: 6px;
     padding: 6px 10px; font-size: 12px; cursor: pointer; }
-  .wyt-ghost:hover { background: #f3f4f6; }
-  .wyt-status { color: #6b7280; font-size: 12px; padding: 6px 0; }
-  .wyt-error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; border-radius: 8px;
+  .toner-ghost:hover { background: #f3f4f6; }
+  .toner-status { color: #6b7280; font-size: 12px; padding: 6px 0; }
+  .toner-error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; border-radius: 8px;
     padding: 8px; }
-  .wyt-spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid #d1d5db;
-    border-top-color: #14b8a6; border-radius: 50%; animation: wyt-spin .7s linear infinite; vertical-align: -1px; margin-right: 6px; }
-  @keyframes wyt-spin { to { transform: rotate(360deg); } }
-  .wyt-link { color: #0d9488; cursor: pointer; text-decoration: underline; }
+  .toner-spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid #d1d5db;
+    border-top-color: #14b8a6; border-radius: 50%; animation: toner-spin .7s linear infinite; vertical-align: -1px; margin-right: 6px; }
+  @keyframes toner-spin { to { transform: rotate(360deg); } }
+  .toner-link { color: #0d9488; cursor: pointer; text-decoration: underline; }
   `;
 
   function ensureHost() {
     if (host) return;
     host = document.createElement("div");
-    host.id = "wyt-host";
+    host.id = "toner-host";
     root = host.attachShadow({ mode: "open" });
     const style = document.createElement("style");
     style.textContent = STYLE;
@@ -223,8 +223,8 @@
     ensureHost();
     if (!btn) {
       btn = document.createElement("button");
-      btn.className = "wyt-btn";
-      btn.title = "Watch Your Tone";
+      btn.className = "toner-btn";
+      btn.title = "Toner";
       btn.textContent = "✎";
       btn.addEventListener("mousedown", (e) => e.preventDefault());
       btn.addEventListener("click", () => openPanel());
@@ -255,7 +255,7 @@
   function buildPanel() {
     ensureHost();
     panel = document.createElement("div");
-    panel.className = "wyt-panel";
+    panel.className = "toner-panel";
 
     const personaOpts = CONFIG.personas
       .map(
@@ -269,32 +269,32 @@
     const actionBtns = CONFIG.actions
       .map(
         (a) =>
-          `<button class="wyt-action" data-action="${a.id}">${a.emoji || ""} ${escapeHtml(
+          `<button class="toner-action" data-action="${a.id}">${a.emoji || ""} ${escapeHtml(
             a.label
           )}</button>`
       )
       .join("");
 
     panel.innerHTML = `
-      <div class="wyt-head">
-        <span class="wyt-title"><span class="dot">●</span> Watch Your Tone</span>
-        <select class="wyt-persona" title="Persona">${personaOpts}</select>
-        <button class="wyt-close" title="Close">×</button>
+      <div class="toner-head">
+        <span class="toner-title"><span class="dot">●</span> Toner</span>
+        <select class="toner-persona" title="Persona">${personaOpts}</select>
+        <button class="toner-close" title="Close">×</button>
       </div>
-      <div class="wyt-body">
-        <div class="wyt-actions">${actionBtns}</div>
-        <div class="wyt-section-label">Your message</div>
-        <div class="wyt-orig"></div>
-        <div class="wyt-out"></div>
+      <div class="toner-body">
+        <div class="toner-actions">${actionBtns}</div>
+        <div class="toner-section-label">Your message</div>
+        <div class="toner-orig"></div>
+        <div class="toner-out"></div>
       </div>
     `;
     root.appendChild(panel);
 
-    panel.querySelector(".wyt-close").addEventListener("click", closePanel);
-    panel.querySelector(".wyt-persona").addEventListener("change", (e) => {
+    panel.querySelector(".toner-close").addEventListener("click", closePanel);
+    panel.querySelector(".toner-persona").addEventListener("change", (e) => {
       CONFIG.activePersonaId = e.target.value;
     });
-    panel.querySelectorAll(".wyt-action").forEach((b) => {
+    panel.querySelectorAll(".toner-action").forEach((b) => {
       b.addEventListener("click", () => runAction(b.dataset.action));
     });
     return panel;
@@ -322,11 +322,11 @@
     panel.style.display = "block";
     panelOpen = true;
     hideButton();
-    panel.querySelector(".wyt-orig").textContent =
+    panel.querySelector(".toner-orig").textContent =
       capture.text || "(empty — type a message first)";
-    panel.querySelector(".wyt-out").innerHTML = capture.text
-      ? `<div class="wyt-status">Pick an action above to refine your message.</div>`
-      : `<div class="wyt-status">Type a message in the box, then pick an action.</div>`;
+    panel.querySelector(".toner-out").innerHTML = capture.text
+      ? `<div class="toner-status">Pick an action above to refine your message.</div>`
+      : `<div class="toner-status">Type a message in the box, then pick an action.</div>`;
     positionPanel();
     if (initialAction && capture.text) runAction(initialAction);
   }
@@ -338,15 +338,15 @@
   }
 
   async function runAction(actionId) {
-    const out = panel.querySelector(".wyt-out");
+    const out = panel.querySelector(".toner-out");
     if (!capture || !capture.text) {
-      out.innerHTML = `<div class="wyt-status">There's no text to work on yet.</div>`;
+      out.innerHTML = `<div class="toner-status">There's no text to work on yet.</div>`;
       return;
     }
-    out.innerHTML = `<div class="wyt-status"><span class="wyt-spinner"></span>Working…</div>`;
+    out.innerHTML = `<div class="toner-status"><span class="toner-spinner"></span>Working…</div>`;
 
     const resp = await send({
-      type: "WYT_REWRITE",
+      type: "TONER_REWRITE",
       payload: {
         actionId,
         personaId: CONFIG.activePersonaId,
@@ -357,14 +357,14 @@
 
     if (!resp || !resp.ok) {
       const msg = resp?.error || "Something went wrong.";
-      out.innerHTML = `<div class="wyt-error">${escapeHtml(msg)} ${
+      out.innerHTML = `<div class="toner-error">${escapeHtml(msg)} ${
         resp?.needsSetup
-          ? `<span class="wyt-link" data-open-settings>Open settings</span>`
+          ? `<span class="toner-link" data-open-settings>Open settings</span>`
           : ""
       }</div>`;
       const link = out.querySelector("[data-open-settings]");
       if (link)
-        link.addEventListener("click", () => send({ type: "WYT_OPEN_OPTIONS" }));
+        link.addEventListener("click", () => send({ type: "TONER_OPEN_OPTIONS" }));
       return;
     }
 
@@ -372,32 +372,32 @@
   }
 
   function renderResult(result) {
-    const out = panel.querySelector(".wyt-out");
+    const out = panel.querySelector(".toner-out");
     let html = "";
     if (result.toneFeedback) {
-      html += `<div class="wyt-section-label">How it may come across</div>
-               <div class="wyt-tone">${escapeHtml(result.toneFeedback)}</div>`;
+      html += `<div class="toner-section-label">How it may come across</div>
+               <div class="toner-tone">${escapeHtml(result.toneFeedback)}</div>`;
     }
     (result.warnings || []).forEach((w) => {
-      html += `<div class="wyt-warn">⚠ ${escapeHtml(w)}</div>`;
+      html += `<div class="toner-warn">⚠ ${escapeHtml(w)}</div>`;
     });
-    html += `<div class="wyt-section-label">Suggestion${
+    html += `<div class="toner-section-label">Suggestion${
       result.suggestions.length > 1 ? "s" : ""
     }</div>`;
 
     result.suggestions.forEach((s, i) => {
-      html += `<div class="wyt-result" data-sugg="${i}">
-        <div class="wyt-sugg-label">${escapeHtml(s.label || "Suggestion")}</div>
-        <textarea class="wyt-suggest">${escapeHtml(s.text)}</textarea>
-        <div class="wyt-row">
-          <button class="wyt-primary" data-replace="${i}">Replace</button>
-          <button class="wyt-ghost" data-copy="${i}">Copy</button>
+      html += `<div class="toner-result" data-sugg="${i}">
+        <div class="toner-sugg-label">${escapeHtml(s.label || "Suggestion")}</div>
+        <textarea class="toner-suggest">${escapeHtml(s.text)}</textarea>
+        <div class="toner-row">
+          <button class="toner-primary" data-replace="${i}">Replace</button>
+          <button class="toner-ghost" data-copy="${i}">Copy</button>
         </div>
       </div>`;
     });
 
-    html += `<div class="wyt-row" style="margin-top:8px">
-      <button class="wyt-ghost" data-regen>↻ Try again</button>
+    html += `<div class="toner-row" style="margin-top:8px">
+      <button class="toner-ghost" data-regen>↻ Try again</button>
     </div>`;
 
     out.innerHTML = html;
@@ -405,7 +405,7 @@
     out.querySelectorAll("[data-replace]").forEach((b) => {
       b.addEventListener("click", () => {
         const idx = b.dataset.replace;
-        const ta = out.querySelector(`[data-sugg="${idx}"] .wyt-suggest`);
+        const ta = out.querySelector(`[data-sugg="${idx}"] .toner-suggest`);
         applyReplacement(capture, ta.value);
         closePanel();
       });
@@ -413,7 +413,7 @@
     out.querySelectorAll("[data-copy]").forEach((b) => {
       b.addEventListener("click", async () => {
         const idx = b.dataset.copy;
-        const ta = out.querySelector(`[data-sugg="${idx}"] .wyt-suggest`);
+        const ta = out.querySelector(`[data-sugg="${idx}"] .toner-suggest`);
         try {
           await navigator.clipboard.writeText(ta.value);
           b.textContent = "Copied ✓";
@@ -497,18 +497,18 @@
 
   // Messages from background (context menu, popup).
   chrome.runtime.onMessage.addListener((msg) => {
-    if (msg?.type === "WYT_OPEN_PANEL") {
+    if (msg?.type === "TONER_OPEN_PANEL") {
       const el = document.activeElement;
       if (isEditable(el)) currentField = el;
       if (currentField) openPanel(msg.actionId || "improve");
-    } else if (msg?.type === "WYT_CONFIG_UPDATED") {
+    } else if (msg?.type === "TONER_CONFIG_UPDATED") {
       loadConfig();
     }
   });
 
   // ---- init ------------------------------------------------------------------
   async function loadConfig() {
-    const resp = await send({ type: "WYT_GET_CONFIG" });
+    const resp = await send({ type: "TONER_GET_CONFIG" });
     if (resp && resp.ok) {
       CONFIG = { ...CONFIG, ...resp };
       // rebuild panel next time it opens to reflect new persona/action lists

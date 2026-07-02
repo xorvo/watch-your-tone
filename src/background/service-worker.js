@@ -10,16 +10,16 @@ import { actionMenu } from "../lib/actions.js";
 // Right-click context menu on selected text.
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
-    id: "wyt-improve",
-    title: "Watch Your Tone: improve selection",
+    id: "toner-improve",
+    title: "Toner: improve selection",
     contexts: ["selection", "editable"],
   });
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "wyt-improve" && tab?.id) {
+  if (info.menuItemId === "toner-improve" && tab?.id) {
     chrome.tabs.sendMessage(tab.id, {
-      type: "WYT_OPEN_PANEL",
+      type: "TONER_OPEN_PANEL",
       actionId: "improve",
       selectionText: info.selectionText || "",
     });
@@ -45,7 +45,7 @@ async function handleRewrite(payload) {
   if (!(await isConfigured())) {
     return {
       ok: false,
-      error: "Watch Your Tone isn't set up yet. Open the extension settings to add your API key or AWS credentials.",
+      error: "Toner isn't set up yet. Open the extension settings to add your API key or AWS credentials.",
       needsSetup: true,
     };
   }
@@ -86,7 +86,7 @@ async function handleRewrite(payload) {
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   (async () => {
     switch (msg?.type) {
-      case "WYT_GET_CONFIG": {
+      case "TONER_GET_CONFIG": {
         const settings = await getSettings();
         sendResponse({
           ok: true,
@@ -99,11 +99,11 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         });
         break;
       }
-      case "WYT_REWRITE": {
+      case "TONER_REWRITE": {
         sendResponse(await handleRewrite(msg.payload || {}));
         break;
       }
-      case "WYT_OPEN_OPTIONS": {
+      case "TONER_OPEN_OPTIONS": {
         chrome.runtime.openOptionsPage();
         sendResponse({ ok: true });
         break;

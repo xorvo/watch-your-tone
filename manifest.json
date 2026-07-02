@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Watch Your Tone",
+  "name": "Toner",
   "version": "0.2.0",
   "description": "An AI writing coach in your text box. Improve clarity, fix grammar, and adjust tone before you hit send.",
   "icons": {
@@ -10,7 +10,7 @@
     "128": "icons/icon128.png"
   },
   "action": {
-    "default_title": "Watch Your Tone",
+    "default_title": "Toner",
     "default_popup": "src/popup/popup.html",
     "default_icon": {
       "16": "icons/icon16.png",

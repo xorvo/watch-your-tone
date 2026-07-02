@@ -1,8 +1,8 @@
-# Privacy Policy — Watch Your Tone
+# Privacy Policy — Toner
 
 _Last updated: 2026-06-17_
 
-Watch Your Tone is built so that privacy is a feature, not an afterthought.
+Toner is built so that privacy is a feature, not an afterthought.
 
 ## What we send
 

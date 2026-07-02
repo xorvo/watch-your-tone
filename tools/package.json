@@ -1,0 +1,9 @@
+{
+  "name": "toner-tools",
+  "private": true,
+  "type": "module",
+  "description": "Build tooling for Toner (icon generation). Not shipped with the extension.",
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2"
+  }
+}

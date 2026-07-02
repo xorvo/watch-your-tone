@@ -1,0 +1,26 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#19c3b1"/>
+      <stop offset="1" stop-color="#0d7d72"/>
+    </linearGradient>
+    <clipPath id="round">
+      <rect x="0" y="0" width="128" height="128" rx="29" ry="29"/>
+    </clipPath>
+  </defs>
+
+  <!-- background -->
+  <g clip-path="url(#round)">
+    <rect x="0" y="0" width="128" height="128" fill="url(#bg)"/>
+    <!-- soft top-left sheen -->
+    <ellipse cx="38" cy="16" rx="80" ry="48" fill="#ffffff" opacity="0.10"/>
+  </g>
+
+  <!-- "T" monogram -->
+  <rect x="30" y="30" width="68" height="15" rx="7.5" fill="#ffffff"/>
+  <rect x="56.5" y="30" width="15" height="50" rx="7" fill="#ffffff"/>
+
+  <!-- ink / toner drop -->
+  <path d="M64 78 C 72 92 77 97 77 103 A 13 13 0 1 1 51 103 C 51 97 56 92 64 78 Z" fill="#f59e0b"/>
+  <ellipse cx="59" cy="99" rx="2.8" ry="3.8" fill="#ffffff" opacity="0.5"/>
+</svg>
